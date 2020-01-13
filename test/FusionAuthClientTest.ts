@@ -18,6 +18,7 @@
 
 import {ApplicationRequest, FusionAuthClient} from '../index';
 import * as chai from 'chai'
+import ClientResponse from "../src/ClientResponse";
 // import 'mocha'
 
 let client;
@@ -92,5 +93,37 @@ describe('#FusionAuthClient()', function () {
     chai.assert.isUndefined(response.exception);
     chai.assert.strictEqual(response.statusCode, 200);
     chai.expect(response.response.application.loginConfiguration.allowTokenRefresh).to.be.true;
+  });
+
+  /**
+   * Tests a connection failure path for fetch exceptions
+   */
+  it('Failed response', async () => {
+    client = new FusionAuthClient('doesntmatter', 'https://local.fusionauth.example.com'); // Doesn't exist
+
+    return client.retrieveTenants()
+        .then((_) => {
+          chai.assert.fail("This should not have succeeded");
+        })
+        .catch((response) => {
+          chai.assert.instanceOf(response, ClientResponse);
+          chai.assert.isNotNull(response.exception);
+          chai.assert.isUndefined(response.statusCode);
+        });
+  });
+
+  /**
+   *
+   */
+  it('Error response', async () => {
+    return client.createApplication(null, {application: {name: 'Bad Application', verifyRegistration: true}})
+        .then((_) => {
+          chai.assert.fail("This should not have succeeded");
+        })
+        .catch((response) => {
+          chai.assert.instanceOf(response, ClientResponse);
+          chai.assert.isDefined(response.statusCode);
+          chai.expect(response.statusCode).to.be.above(399).and.below(500);
+        });
   });
 });
