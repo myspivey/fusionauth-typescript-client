@@ -31,7 +31,7 @@ export default class DefaultRESTClient<RT, ERT> implements IRESTClient<RT, ERT> 
   public uri: string;
   public credentials: RequestCredentials;
   public responseHandler: ResponseHandler<RT> = DefaultRESTClient.emptyResponseHandler;
-  public errorResponseHandler: ErrorResponseHandler<ERT>;
+  public errorResponseHandler: ErrorResponseHandler<ERT> = DefaultRESTClient.emptyResponseHandler;
 
   constructor(public host: string) {
   }
